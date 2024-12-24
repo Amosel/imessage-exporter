@@ -1,6 +1,6 @@
 # Binary Documentation
 
-The `imessage-exporter` binary exports iMessage data to `txt` or `html` formats. It can also run diagnostics to find problems with the iMessage database.
+The `imessage-exporter` binary exports iMessage data to `txt`, `json` or `html` formats. It can also run diagnostics to find problems with the iMessage database.
 
 ## Installation
 
@@ -40,7 +40,7 @@ The [releases page](https://github.com/ReagentX/imessage-exporter/releases) prov
 -d, --diagnostics
         Print diagnostic information and exit
         
--f, --format <txt, html>
+-f, --format <txt, json, html>
         Specify a single file format to export messages into
         
 -c, --copy-method <clone, basic, full, disabled>
@@ -115,10 +115,10 @@ Export as `html` and copy attachments in web-compatible formats from the default
 imessage-exporter -f html -c full
 ```
 
-Export as `txt` and copy attachments in their original formats from the default iMessage Database location to a new folder in the current working directory called `output`:
+Export as `json` and copy attachments in their original formats from the default iMessage Database location to a new folder in the current working directory called `output`:
 
 ```zsh
-imessage-exporter -f txt -o output -c clone
+imessage-exporter -f json -o output -c clone
 ```
 
 Export as `txt` from the an unencrypted iPhone backup located at `~/iphone_backup_latest` to a new folder in the current working directory called `backup_export`:

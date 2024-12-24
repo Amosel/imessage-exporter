@@ -104,6 +104,45 @@ pub struct Message {
     pub edited_parts: Option<EditedMessage>,
 }
 
+impl Default for Message {
+    fn default() -> Self {
+        Message {
+            rowid: 0,
+            guid: String::new(),
+            text: None,
+            service: None,
+            handle_id: None,
+            destination_caller_id: None,
+            subject: None,
+            date: 0,
+            date_read: 0,
+            date_delivered: 0,
+            is_from_me: false,
+            is_read: false,
+            item_type: 0,
+            other_handle: 0,
+            share_status: false,
+            share_direction: false,
+            group_title: None,
+            group_action_type: 0,
+            associated_message_guid: None,
+            associated_message_type: None,
+            balloon_bundle_id: None,
+            expressive_send_style_id: None,
+            thread_originator_guid: None,
+            thread_originator_part: None,
+            date_edited: 0,
+            associated_message_emoji: None,
+            chat_id: None,
+            num_attachments: 0,
+            deleted_from: None,
+            num_replies: 0,
+            components: None,
+            edited_parts: None,
+        }
+    }
+}
+
 impl Table for Message {
     fn from_row(row: &Row) -> Result<Message> {
         Ok(Message {
@@ -147,7 +186,7 @@ impl Table for Message {
     fn get(db: &Connection) -> Result<Statement, TableError> {
         // If the database has `chat_recoverable_message_join`, we can restore some deleted messages.
         // If database has `thread_originator_guid`, we can parse replies, otherwise default to 0
-        Ok(db.prepare(&format!(
+        db.prepare(&format!(
             // macOS Ventura+ and i0S 16+ schema, interpolated with required columns for performance
             "SELECT
                  {COLS},
@@ -161,7 +200,7 @@ impl Table for Message {
              ORDER BY
                  m.date;
             "
-        )).or(db.prepare(&format!(
+        )).or_else(|_| db.prepare(&format!(
             // macOS Big Sur to Monterey, iOS 14 to iOS 15 schema
             "SELECT
                  *,
@@ -175,8 +214,7 @@ impl Table for Message {
              ORDER BY
                  m.date;
             "
-        )))
-        .unwrap_or(db.prepare(&format!(
+        ))).or_else(|_| db.prepare(&format!(
             // macOS Catalina, iOS 13 and older 
             "SELECT
                  *,
@@ -190,8 +228,7 @@ impl Table for Message {
              ORDER BY
                  m.date;
             "
-        )).map_err(TableError::Messages)?)
-    )
+        ))).map_err(TableError::Messages)
     }
 
     fn extract(message: Result<Result<Self, Error>, Error>) -> Result<Self, TableError> {

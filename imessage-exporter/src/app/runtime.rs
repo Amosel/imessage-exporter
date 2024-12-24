@@ -37,6 +37,8 @@ use imessage_database::{
     util::{dates::get_offset, size::format_file_size},
 };
 
+use crate::exporters::json::JSONExporter;
+
 /// Stores the application state and handles application lifecycle
 pub struct Config {
     /// Map of chatroom ID to chatroom information
@@ -441,6 +443,9 @@ impl Config {
                 }
                 ExportType::Txt => {
                     TXT::new(self)?.iter_messages()?;
+                }
+                ExportType::Json => {
+                    JSONExporter::new(self)?.iter_messages()?;
                 }
             }
         }
